@@ -1,0 +1,9 @@
+﻿  P3_PostFixEvaluator.cpp
+  Generating Code...
+  Compiling...
+  PostFixEvaluator.cpp
+c:\users\chase\onedrive - university of wisconsin-stout\development\cpp\visualstudio\p3_postfixevaluator\p3_postfixevaluator\postfixevaluator.h(38): warning C4018: '<': signed/unsigned mismatch
+  c:\users\chase\onedrive - university of wisconsin-stout\development\cpp\visualstudio\p3_postfixevaluator\p3_postfixevaluator\postfixevaluator.cpp(29): note: see reference to function template instantiation 'bool PostFixEvaluator::isNumber<double>(std::string)' being compiled
+  Generating Code...
+  P3_PostFixEvaluator.vcxproj -> C:\Users\chase\OneDrive - University of Wisconsin-Stout\Development\cpp\visualstudio\P3_PostFixEvaluator\Debug\P3_PostFixEvaluator.exe
+  P3_PostFixEvaluator.vcxproj -> C:\Users\chase\OneDrive - University of Wisconsin-Stout\Development\cpp\visualstudio\P3_PostFixEvaluator\Debug\P3_PostFixEvaluator.pdb (Full PDB)
