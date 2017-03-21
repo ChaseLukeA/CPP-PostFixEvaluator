@@ -2,10 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "P3_PostFixEvaluator.h"
-#include "PostFixEvaluator.h"
 #include <iostream>
 #include <string>
+#include "P3_PostFixEvaluator.h"
+#include "PostFixEvaluator.h"
 
 using namespace std;
 
@@ -21,8 +21,6 @@ int main()
 	pfe.getInput();
 	pfe.getInput();
 	pfe.getInput();
-
-
 
 	cin >> pause;
     return 0;

@@ -1,36 +1,60 @@
 #pragma once
+#include <stdexcept>
 #include <stack>
 #include <string>
+#include <vector>
 #include <typeinfo>
 
 using namespace std;
 
+enum Operator
+{
+	Add = 1,
+	Subtract = 2,
+	Multiply = 3,
+	Divide = 4,
+	Modulo = 5
+};
+
 class PostFixEvaluator
 {
 public:
-	PostFixEvaluator();
-	virtual ~PostFixEvaluator();
+	PostFixEvaluator() {}
+	virtual ~PostFixEvaluator() {}
 
 	void getInput();
 
-	void parseTypes(string value);
-
 private:
 	stack<double> m_Operands;
-	double m_Number;
 
-	float evaluate(stack<double>& operands, string _operator);
+	bool isValidExpression(string value);
+	double evaluate(stack<double>& operands, Operator op);
+
 	bool isNumber(string value);
+	double parseNumber(string value);
+
+	bool isOperator(string value);
+	Operator parseOperator(string value);
+
+	bool contains(string values, string value) { return values.find(value) <= values.length(); }
 
 	template<class NUMBER_TYPE>
-	NUMBER_TYPE parseNumber(string value);
+	NUMBER_TYPE parseNumberType(string value);
 };
 
-
+// generic function I wrote to parse any type of number
+// from a string using the STL 'sto?' functions
 template<class NUMBER_TYPE>
-inline NUMBER_TYPE PostFixEvaluator::parseNumber(string value)
+inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value)
 {
-	if (!isNumber(value)) return 0;
+	if (!isNumber(value)) throw std::invalid_argument("Not a number!");
+
+	// add '0' before decimal point if none exists;
+	// prevents crash when converting to int/etc
+	if (value[0] == '.' && value.length() > 1)
+		value.replace(0, 1, "0.");
+	if (value[0] == '-' && value[1] == '.' && value.length() > 2)
+		value.replace(1, 1, "0.");
 
 	string numberType = string(typeid(NUMBER_TYPE).name());
 
@@ -43,5 +67,5 @@ inline NUMBER_TYPE PostFixEvaluator::parseNumber(string value)
 	if (numberType == "float") return stof(value);
 	if (numberType == "double") return stod(value);
 	
-	return 0;
+	throw std::invalid_argument("No valid numeric type was provided!");
 }
