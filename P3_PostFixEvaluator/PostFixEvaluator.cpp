@@ -4,34 +4,37 @@
 #include <string>
 #include "PostFixEvaluator.h"
 
+#include <regex>
 
 void PostFixEvaluator::getInput()
 {
 	string expression;
 
 	cout << "Enter an expression to evaluate:" << endl;
-	cin >> expression;
+	getline(cin, expression);
 
 	if (isValidExpression(expression))
 		cout << "Valid expression!" << endl;
+		// evaluate expression
 	else
 		cout << "Invalid expression!" << endl;
-
+		// alert only
 }
 
-// function I created to parse string to see if a valid number exists;
-// checks for first character sign (-) or decimal point (.);
-// only allows one decimal point character
+// function I created to parse string to see if a valid number exists (without using regex)
+// using these valid number formats: '#' || '#.#' || '.#' || '-#' || '-#.#' || '-.#'
 bool PostFixEvaluator::isNumber(string value)
 {
 	int startingIndex = 0;
 	bool decimalExists = false;
 
-	// check if starts with dash (negative sign)
+	// check if starts with a dash (negative sign)
 	if (value[0] == '-')
 	{
-		if (value.length() > 1) { startingIndex = 1; }
-		else { return false; }
+		if (value.length() > 1)
+			startingIndex = 1;
+		else
+			return false;
 	}
 
 	// check if starts with decimal point
@@ -46,13 +49,72 @@ bool PostFixEvaluator::isNumber(string value)
 		// find one decimal point only
 		if (value[i] == '.')
 		{
-			if (decimalExists) { return false; }
-			else { decimalExists = true; }
+			if (!decimalExists)
+				decimalExists = true;
+			else
+				return false;
 		}
 		// find if character is a digit
-		else if (!isdigit(value[i])) { return false; }
+		else if (!isdigit(value[i]))
+		{
+			return false;
+		}
 	}
+	// valid number
 	return true;
+}
+
+bool PostFixEvaluator::isNumberRegex(string value)
+{
+	//    +/-     (      .### / ###       /               ###.###               )      e/E      +/-         ###  
+	// (\\+|-)?   ( ((\.)?([[:digit:]]+)) | (([[:digit:]]+)(\.)([[:digit:]]+)?) )   ( (e|E)  (\\+|-)?  ([[:digit:]]+) )?
+	regex number("(\\+|-)?(((\.)?([[:digit:]]+))|(([[:digit:]]+)(\.)([[:digit:]]+)?))((e|E)(\\+|-)?([[:digit:]]+))?");
+	return regex_match(value, number);
+}
+
+void PostFixEvaluator::testNumberRegex()
+{
+	for (int sign = 0; sign < 3; sign++) // signs '', '+', '-'
+	{
+		for (int firstNum = 0; firstNum < 2; firstNum++) // first number '', '#'
+		{
+			for (int decimalPoint = 0; decimalPoint < 2; decimalPoint++) // decimal point '', '.'
+			{
+				for (int secondNum = 0; secondNum < 2; secondNum++) // second number '', '#'
+				{
+					for (int exponentSymbol = 0; exponentSymbol < 3; exponentSymbol++) // exponent symbol '', 'e', 'E'
+					{
+						for (int exponentSign = 0; exponentSign < 3; exponentSign++) // exponent sign '', '+', '-'
+						{
+							string number;
+							string tabs = "\t";
+							if (sign == 1) number += "+";
+							if (sign == 2) number += "-";
+							if (firstNum == 1) number += "12";
+							if (decimalPoint == 1) number += ".";
+							if (secondNum == 1) number += "34";
+							if (exponentSymbol == 1) number += "e";
+							if (exponentSymbol == 2) number += "E";
+							if (exponentSymbol > 0)
+							{
+								if (exponentSign == 1) number += "+";
+								if (exponentSign == 2) number += "-";
+								number += "56";
+							}
+
+							cout << number;
+							if (number.length() < 8) tabs += "\t";
+
+							if (isNumberRegex(number))
+								cout << tabs << "VALID!" << endl;
+							else
+								cout << tabs << "NaN!!!!!!!!!!!!!!!!!!!" << endl;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 double PostFixEvaluator::parseNumber(string value)

@@ -16,11 +16,14 @@ int main()
 
 	PostFixEvaluator pfe;
 
-	pfe.getInput();
-	pfe.getInput();
-	pfe.getInput();
-	pfe.getInput();
-	pfe.getInput();
+	pfe.testNumberRegex();
+
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	pfe.getInput();
+	//	cout << "----------------------------------------------------------" << endl;
+	//}
+
 
 	cin >> pause;
     return 0;

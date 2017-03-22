@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// friendly names for the 5 common arithmetic operators
 enum Operator
 {
 	Add = 1,
@@ -23,12 +24,14 @@ public:
 	virtual ~PostFixEvaluator() {}
 
 	void getInput();
+	bool isNumberRegex(string value);
+	void testNumberRegex();
 
 private:
 	stack<double> m_Operands;
 
 	bool isValidExpression(string value);
-	double evaluate(stack<double>& operands, Operator op);
+	double evaluateExpression(stack<double>& operands, Operator op);
 
 	bool isNumber(string value);
 	double parseNumber(string value);
@@ -36,13 +39,11 @@ private:
 	bool isOperator(string value);
 	Operator parseOperator(string value);
 
-	bool contains(string values, string value) { return values.find(value) <= values.length(); }
-
 	template<class NUMBER_TYPE>
 	NUMBER_TYPE parseNumberType(string value);
 };
 
-// generic function I wrote to parse any type of number
+// generic function I wrote to parse any specified number type
 // from a string using the STL 'sto?' functions
 template<class NUMBER_TYPE>
 inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value)
@@ -50,13 +51,13 @@ inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value)
 	if (!isNumber(value)) throw std::invalid_argument("Not a number!");
 
 	// add '0' before decimal point if none exists;
-	// prevents crash when converting to int/etc
+	// this prevents crash when converting to int/etc
 	if (value[0] == '.' && value.length() > 1)
 		value.replace(0, 1, "0.");
 	if (value[0] == '-' && value[1] == '.' && value.length() > 2)
 		value.replace(1, 1, "0.");
 
-	string numberType = string(typeid(NUMBER_TYPE).name());
+	string numberType = typeid(NUMBER_TYPE).name();
 
 	if (numberType == "int") return stoi(value);
 	if (numberType == "long") return stol(value);
