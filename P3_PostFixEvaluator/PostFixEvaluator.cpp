@@ -25,39 +25,77 @@ void PostFixEvaluator::getInput()
 // using these valid number formats: '#' || '#.#' || '.#' || '-#' || '-#.#' || '-.#'
 bool PostFixEvaluator::isNumber(string value)
 {
-	int startingIndex = 0;
+	int size = value.length();
+	int start;
 	bool decimalExists = false;
+	bool exponentExists = false;
+	int exponentIndex = -1;
+	int lastNumberIndex = -1;
 
-	// check if starts with a dash (negative sign)
-	if (value[0] == '-')
-	{
-		if (value.length() > 1)
-			startingIndex = 1;
-		else
-			return false;
-	}
+	// check for empty string or these characters
+	if (value == "" || value == "+." || value == "-.") return false;
 
-	// check if starts with decimal point
-	if (value[0] == '.' && value.length() > 1)
+	// check if first character decimal point or sign symbol
+	switch (value[0])
 	{
+	case '.':
 		decimalExists = true;
-		startingIndex = 1;
+	case '+':
+	case '-':
+		// all three above cases fall through to check if only character
+		if (size == 1) return false;
+
+		// start looping through characters at second index
+		start = 1;
+		break;
+	default:
+		// start looping through characters at first index
+		start = 0;
 	}
 
-	for (int i = startingIndex; i < value.length(); i++)
+	for (int i = start; i < size; i++)
 	{
-		// find one decimal point only
-		if (value[i] == '.')
+		switch (value[i])
 		{
-			if (!decimalExists)
-				decimalExists = true;
-			else
-				return false;
-		}
-		// find if character is a digit
-		else if (!isdigit(value[i]))
-		{
-			return false;
+		case '.': // character is decimal point
+			// no post-exponent decimal point allowed
+			if (exponentExists) return false;
+
+			// only one decimal point allowed
+			if (decimalExists) return false;
+
+			// decimal now exists
+			decimalExists = true;
+			break;
+		case 'e':
+		case 'E': // character is exponent symbol
+			// only one exponent symbol allowed
+			if (exponentExists) return false;
+
+			// pre-exponent number must exist
+			if (lastNumberIndex == -1) return false;
+
+			// exponent now exists at specified index
+			exponentExists = true;
+			exponentIndex = i;
+			break;
+		case '+':
+		case '-': // character is sign symbol
+			// only post-exponent sign symbol allowed
+			if (!exponentExists) return false;
+
+			// only immediately post-exponent allowed
+			if (exponentIndex != i - 1) return false;
+
+			// cannot be the last character
+			if (i == size - 1) return false;
+			break;
+		default:  // character is digit or not
+			if (!isdigit(value[i])) return false;
+
+			// last number exists at index
+			lastNumberIndex = i;
+			break;
 		}
 	}
 	// valid number
@@ -74,6 +112,8 @@ bool PostFixEvaluator::isNumberRegex(string value)
 
 void PostFixEvaluator::testNumberRegex()
 {
+	cout << "Testing all possible number combinations with the isNumberRegex() method:" << endl;
+
 	for (int sign = 0; sign < 3; sign++) // signs '', '+', '-'
 	{
 		for (int firstNum = 0; firstNum < 2; firstNum++) // first number '', '#'
@@ -102,13 +142,19 @@ void PostFixEvaluator::testNumberRegex()
 								number += "56";
 							}
 
-							cout << number;
 							if (number.length() < 8) tabs += "\t";
 
-							if (isNumberRegex(number))
-								cout << tabs << "VALID!" << endl;
+							cout << "'" << number << "'";
+							if (isNumber2(number))
+								cout << tabs << "IN - VALID!" << endl;
 							else
-								cout << tabs << "NaN!!!!!!!!!!!!!!!!!!!" << endl;
+								cout << tabs << "IN - NaN!!!!!!!!!!!!!!!!!!!" << endl;
+
+							cout << "'" << number << "'";
+							if (isNumberRegex(number))
+								cout << tabs << "RX - VALID!" << endl << endl;
+							else
+								cout << tabs << "RX - NaN!!!!!!!!!!!!!!!!!!!" << endl << endl;
 						}
 					}
 				}
