@@ -7,14 +7,13 @@
 
 using namespace std;
 
-// friendly names for the 5 common arithmetic operators
+// friendly names for the 4 common arithmetic operators
 enum Operator
 {
 	Add = 1,
 	Subtract = 2,
 	Multiply = 3,
-	Divide = 4,
-	Modulo = 5
+	Divide = 4
 };
 
 class PostFixEvaluator
@@ -25,13 +24,14 @@ public:
 
 	void getInput();
 	bool isNumberRegex(string value);
-	void testNumberRegex();
+	void isNumberMethodsTest();
 
 private:
 	stack<double> m_Operands;
 
 	bool isValidExpression(string value);
-	double evaluateExpression(stack<double>& operands, Operator op);
+	double evaluateExpression(string value);
+	double calculateExpression(stack<double>& operands, Operator op);
 
 	bool isNumber(string value);
 	double parseNumber(string value);
@@ -40,13 +40,15 @@ private:
 	Operator parseOperator(string value);
 
 	template<class NUMBER_TYPE>
-	NUMBER_TYPE parseNumberType(string value);
+	NUMBER_TYPE parseNumberType(string value, bool useNewMethods);
 };
 
 // generic function I wrote to parse any specified number type
-// from a string using the STL 'sto?' functions
+// from a string using the STL functions; can use the new C++11 'sto?'
+// methods by specifying 'true' after the value; default behavior
+// uses the STL 'ato?' functions
 template<class NUMBER_TYPE>
-inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value)
+inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value, bool useNewMethods = false)
 {
 	if (!isNumber(value)) throw std::invalid_argument("Not a number!");
 
@@ -59,14 +61,24 @@ inline NUMBER_TYPE PostFixEvaluator::parseNumberType(string value)
 
 	string numberType = typeid(NUMBER_TYPE).name();
 
-	if (numberType == "int") return stoi(value);
-	if (numberType == "long") return stol(value);
-	if (numberType == "unsigned long") return stoul(value);
-	if (numberType == "long long") return stoll(value);
-	if (numberType == "unsigned long long") return stoull(value);
-	if (numberType == "long double") return stold(value);
-	if (numberType == "float") return stof(value);
-	if (numberType == "double") return stod(value);
+	if (useNewMethods) // use C++11 methods
+	{
+		if (numberType == "int") return stoi(value);
+		if (numberType == "long") return stol(value);
+		if (numberType == "unsigned long") return stoul(value);
+		if (numberType == "long long") return stoll(value);
+		if (numberType == "unsigned long long") return stoull(value);
+		if (numberType == "long double") return stold(value);
+		if (numberType == "float") return stof(value);
+		if (numberType == "double") return stod(value);
+	}
+	else // use pre C++11 methods
+	{
+		if (numberType == "int") return atoi(value.c_str());
+		if (numberType == "long") return atol(value.c_str());
+		if (numberType == "long long") return atoll(value.c_str());
+		if (numberType == "double") return atof(value.c_str());
+	}
 	
 	throw std::invalid_argument("No valid numeric type was provided!");
 }

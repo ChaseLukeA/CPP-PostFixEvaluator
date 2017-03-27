@@ -12,20 +12,23 @@ using namespace std;
 int main()
 {
 	int pause;
-	cout << "Hello world!" << endl;
+	string more = "y";
 
 	PostFixEvaluator pfe;
+	//pfe.isNumberMethodsTest();
 
-	pfe.testNumberRegex();
+	while (more == "y" || more == "Y")
+	{
+		pfe.getInput();
 
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	pfe.getInput();
-	//	cout << "----------------------------------------------------------" << endl;
-	//}
+		cout << endl << "----------------------------------------------------------";
+		cout << endl << "Continue evaluating PostFix expressions? (y/n): ";
+		getline(cin, more);
+		cout << endl;
+	}
 
-
-	cin >> pause;
+	cout << "Thank you for using the PostFix Evaluator!" << endl << endl << "Press any key to exit";
+	getchar();
     return 0;
 }
 

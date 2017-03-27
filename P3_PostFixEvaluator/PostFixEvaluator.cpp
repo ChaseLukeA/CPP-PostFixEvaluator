@@ -10,19 +10,29 @@ void PostFixEvaluator::getInput()
 {
 	string expression;
 
-	cout << "Enter an expression to evaluate:" << endl;
+	system("cls");
+	cout << endl;
+
+	cout << "Enter an expression to evaluate:" << endl << endl;
 	getline(cin, expression);
 
+	system("cls");
+	cout << endl;
+
 	if (isValidExpression(expression))
-		cout << "Valid expression!" << endl;
-		// evaluate expression
+	{
+		cout << "Valid expression:" << endl << endl;
+		cout << expression << " = " << evaluateExpression(expression) << endl;
+	}
 	else
-		cout << "Invalid expression!" << endl;
-		// alert only
+	{
+		cout << "Invalid expression!" << endl << endl;
+		cout << "Please try again!" << endl;
+	}
 }
 
 // function I created to parse string to see if a valid number exists (without using regex)
-// using these valid number formats: '#' || '#.#' || '.#' || '-#' || '-#.#' || '-.#'
+// using this number format: (+|-)#.#(e|E(+|-)#)
 bool PostFixEvaluator::isNumber(string value)
 {
 	int size = value.length();
@@ -110,9 +120,9 @@ bool PostFixEvaluator::isNumberRegex(string value)
 	return regex_match(value, number);
 }
 
-void PostFixEvaluator::testNumberRegex()
+void PostFixEvaluator::isNumberMethodsTest()
 {
-	cout << "Testing all possible number combinations with the isNumberRegex() method:" << endl;
+	cout << "Testing all possible number combinations with the isNumber() and isNumberRegex() methods:" << endl;
 
 	for (int sign = 0; sign < 3; sign++) // signs '', '+', '-'
 	{
@@ -142,19 +152,19 @@ void PostFixEvaluator::testNumberRegex()
 								number += "56";
 							}
 
-							if (number.length() < 8) tabs += "\t";
+							if (number.length() <= 5) tabs += "\t";
 
 							cout << "'" << number << "'";
-							if (isNumber2(number))
-								cout << tabs << "IN - VALID!" << endl;
+							if (isNumber(number))
+								cout << tabs << "CODE - VALID!" << endl;
 							else
-								cout << tabs << "IN - NaN!!!!!!!!!!!!!!!!!!!" << endl;
+								cout << tabs << "CODE - NaN!!!!!!!!!!!!!!!!!!!" << endl;
 
 							cout << "'" << number << "'";
 							if (isNumberRegex(number))
-								cout << tabs << "RX - VALID!" << endl << endl;
+								cout << tabs << "REGX - VALID!" << endl << endl;
 							else
-								cout << tabs << "RX - NaN!!!!!!!!!!!!!!!!!!!" << endl << endl;
+								cout << tabs << "REGX - NaN!!!!!!!!!!!!!!!!!!!" << endl << endl;
 						}
 					}
 				}
@@ -165,7 +175,7 @@ void PostFixEvaluator::testNumberRegex()
 
 double PostFixEvaluator::parseNumber(string value)
 {
-	return parseNumberType<double>(value);
+	return parseNumberType<double>(value, false);
 }
 
 bool PostFixEvaluator::isOperator(string value)
@@ -181,23 +191,118 @@ Operator PostFixEvaluator::parseOperator(string value)
 	if (value == "-") return Subtract;
 	if (value == "*") return Multiply;
 	if (value == "/") return Divide;
-	if (value == "%") return Modulo;
 }
 
-bool PostFixEvaluator::isValidExpression(string operands)
+bool PostFixEvaluator::isValidExpression(string value)
 {
-	istringstream expressionValues(operands);
+	istringstream expressionValues(value);
+	int numberOfOperands = 0;
+	bool lastIsOperator = false;
 
 	while (expressionValues)
 	{
 		string value;
 		expressionValues >> value;
 		if (value != "")
-			if (!isNumber(value) && !isOperator(value))
+			if (isNumber(value))
+			{ 
+				numberOfOperands++;
+				lastIsOperator = false;
+			}
+			else if (isOperator(value))
+			{
+				// operator must follow at least 2 operands
+				if (numberOfOperands >= 2)
+				{
+					lastIsOperator = true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
 				return false;
+			}
 	}
+	if (!lastIsOperator) return false;
+
 	return true;
 }
+
+double PostFixEvaluator::evaluateExpression(string value)
+{
+	double calculatedValue;
+
+	if (!isValidExpression(value)) return 0;
+
+	istringstream expressionValues(value);
+
+	while (expressionValues)
+	{
+		string value;
+		expressionValues >> value;
+
+		if (isNumber(value))
+			m_Operands.push(parseNumber(value));
+
+		if (isOperator(value))
+		{
+			calculatedValue = calculateExpression(m_Operands, parseOperator(value));
+			m_Operands.push(calculatedValue);
+		}
+	}
+	return calculatedValue;
+}
+
+double PostFixEvaluator::calculateExpression(stack<double>& operands, Operator op)
+{
+	double number1, number2;
+	number1 = operands.top();
+	operands.pop();
+	number2 = operands.top();
+	operands.pop();
+
+	switch (op)
+	{
+	case Add:
+		return number2 + number1;
+	case Subtract:
+		return number2 - number1;
+	case Multiply:
+		return number2 * number1;
+	case Divide:
+		return number2 / number1;
+	}
+}
+
+/*
+// EXAMPLES TO PASS:
+
+	Infix:  (3 * 3) + 1 * (2 + 6)
+
+	Postfix : 3 3 * 1 + 2  6 + *
+
+	Evaluates to 80
+
+	--------------------------
+
+	Infix : (3 * 3) + 1 + (2 + 6)
+
+	Postfix : 3 3 * 1 + 2  6 + +
+
+	Evaluates to 18
+
+	--------------------------
+
+	Infix : (3 + 2) + (6 + 4) * 2
+
+	Postfix : 3 2 + 2 6 4 + *+
+
+	Evaluates to 25
+*/
+
 
 
 	////if (!isDouble(value))
