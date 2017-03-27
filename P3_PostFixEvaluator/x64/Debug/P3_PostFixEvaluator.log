@@ -1,0 +1,4 @@
+﻿  P3_PostFixEvaluator.cpp
+c:\cpp\cpp-postfixevaluator\p3_postfixevaluator\p3_postfixevaluator.cpp(14): warning C4101: 'pause': unreferenced local variable
+  P3_PostFixEvaluator.vcxproj -> C:\cpp\CPP-PostFixEvaluator\x64\Debug\P3_PostFixEvaluator.exe
+  P3_PostFixEvaluator.vcxproj -> C:\cpp\CPP-PostFixEvaluator\x64\Debug\P3_PostFixEvaluator.pdb (Full PDB)
