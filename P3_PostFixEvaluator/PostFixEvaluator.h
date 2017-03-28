@@ -1,7 +1,38 @@
+// ---------------------------------------------------------------------------
+//    
+//                   University of Wisconsin-Stout
+//            Mathematics, Statistics & Computer Science
+//                 CS-244 Data Structures - Fall 2016
+//
+// This software is student work for CSS-244 Data Structures and may not
+// be copied except by the original author and instructor.
+// Copyright 2016
+//
+// PostFixEvaluator.
+//
+// The PostFix evaluator class with a generic toNumberType() method for
+// extracting any type from a string, methods to validate string characters
+// contain only a number or only an operator, a method to validate a string
+// is an actual expression to evaluate, and a method to actually calculate
+// the expression; I also wrote a custom isNumber() method to find if a string
+// contains a number, including +/- signs, exponents, and decimal points; I
+// also wrote a regex and a test class to test the logic (the regex is still
+// slightly off but the isNumber() using logic is spot on)
+//
+// Instructor: Jocelyn Richardt
+// Assignment: Project 3: PostFix Evaluator
+// Author: Luke A Chase
+// Date: 03/07/2017
+//
+// ---------------------------------------------------------------------------
+
 #pragma once
 #include <stdexcept>
+#include <iostream>
+#include <sstream>
 #include <stack>
 #include <string>
+#include <regex>
 #include <vector>
 #include <typeinfo>
 

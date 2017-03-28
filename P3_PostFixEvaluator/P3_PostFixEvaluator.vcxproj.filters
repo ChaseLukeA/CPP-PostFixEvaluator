@@ -24,9 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="P3_PostFixEvaluator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PostFixEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -35,10 +32,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="P3_PostFixEvaluator.cpp">
+    <ClCompile Include="PostFixEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PostFixEvaluator.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

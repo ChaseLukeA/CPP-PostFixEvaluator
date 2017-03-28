@@ -1,10 +1,33 @@
-#include "stdafx.h"
-#include <iostream>
-#include <sstream>
-#include <string>
-#include "PostFixEvaluator.h"
+// ---------------------------------------------------------------------------
+//    
+//                   University of Wisconsin-Stout
+//            Mathematics, Statistics & Computer Science
+//                 CS-244 Data Structures - Fall 2016
+//
+// This software is student work for CSS-244 Data Structures and may not
+// be copied except by the original author and instructor.
+// Copyright 2016
+//
+// PostFixEvaluator.cpp
+//
+// The PostFix evaluator class with a generic toNumberType() method for
+// extracting any type from a string, methods to validate string characters
+// contain only a number or only an operator, a method to validate a string
+// is an actual expression to evaluate, and a method to actually calculate
+// the expression; I also wrote a custom isNumber() method to find if a string
+// contains a number, including +/- signs, exponents, and decimal points; I
+// also wrote a regex and a test class to test the logic (the regex is still
+// slightly off but the isNumber() using logic is spot on)
+//
+// Instructor: Jocelyn Richardt
+// Assignment: Project 3: PostFix Evaluator
+// Author: Luke A Chase
+// Date: 03/07/2017
+//
+// ---------------------------------------------------------------------------
 
-#include <regex>
+#include "stdafx.h"
+#include "PostFixEvaluator.h"
 
 void PostFixEvaluator::getInput()
 {
@@ -26,13 +49,14 @@ void PostFixEvaluator::getInput()
 	}
 	else
 	{
-		cout << "Invalid expression!" << endl << endl;
-		cout << "Please try again!" << endl;
+		cout << "Invalid expression!" << endl << endl << "Please try again!" << endl;
 	}
 }
 
-// function I created to parse string to see if a valid number exists (without using regex)
+// function I created to parse string to see if a valid number exists
 // using this number format: (+|-)#.#(e|E(+|-)#)
+// since this code is nearly identical in most languages I plan to use
+// this custom code to find if a string is a number in other languages
 bool PostFixEvaluator::isNumber(string value)
 {
 	int size = value.length();
@@ -112,6 +136,10 @@ bool PostFixEvaluator::isNumber(string value)
 	return true;
 }
 
+// the number regex I came up with to also see if a valid
+// number is contained in a string; this regex is still very
+// slightly off, giving a false "valid" for a handful of non-
+// number strings where just an exponent is provided
 bool PostFixEvaluator::isNumberRegex(string value)
 {
 	//    +/-     (      .### / ###       /               ###.###               )      e/E      +/-         ###  
@@ -120,6 +148,8 @@ bool PostFixEvaluator::isNumberRegex(string value)
 	return regex_match(value, number);
 }
 
+// I'm running several nexted loops to build all possible number
+// combinations for testing my isNumber() and isNumberRegex() methods
 void PostFixEvaluator::isNumberMethodsTest()
 {
 	cout << "Testing all possible number combinations with the isNumber() and isNumberRegex() methods:" << endl;
@@ -173,16 +203,20 @@ void PostFixEvaluator::isNumberMethodsTest()
 	}
 }
 
+// wrapper around my generic parseNumberType<>() method
+// to use double for this class
 double PostFixEvaluator::parseNumber(string value)
 {
 	return parseNumberType<double>(value, false);
 }
 
+// find out if the provided string character is an operator
 bool PostFixEvaluator::isOperator(string value)
 {
 	return value == "+" || value == "-" || value == "*" || value == "/" || value == "%";
 }
 
+// parse the operator out of the string into my Operator enum
 Operator PostFixEvaluator::parseOperator(string value)
 {
 	if (!isOperator(value)) throw invalid_argument("Not a valid operator!");
@@ -193,6 +227,9 @@ Operator PostFixEvaluator::parseOperator(string value)
 	if (value == "/") return Divide;
 }
 
+// check if the passed-in string expression really is an
+// expression; can only contain numbers and operators, and
+// must start with a minimum of two numbers
 bool PostFixEvaluator::isValidExpression(string value)
 {
 	istringstream expressionValues(value);
@@ -213,13 +250,9 @@ bool PostFixEvaluator::isValidExpression(string value)
 			{
 				// operator must follow at least 2 operands
 				if (numberOfOperands >= 2)
-				{
 					lastIsOperator = true;
-				}
 				else
-				{
 					return false;
-				}
 			}
 			else
 			{
@@ -231,24 +264,32 @@ bool PostFixEvaluator::isValidExpression(string value)
 	return true;
 }
 
+// evaluate a valid string expression with the PostFix
+// evaluation method of arithmetic
 double PostFixEvaluator::evaluateExpression(string value)
 {
 	double calculatedValue;
 
+	// see if its a valid expression before anything
 	if (!isValidExpression(value)) return 0;
 
 	istringstream expressionValues(value);
 
+	// each value in expressionValues comes after a
+	// space in the string (space-separated)
 	while (expressionValues)
 	{
 		string value;
 		expressionValues >> value;
 
 		if (isNumber(value))
-			m_Operands.push(parseNumber(value));
-
-		if (isOperator(value))
 		{
+			// is a number, add any valid number to Stack
+			m_Operands.push(parseNumber(value));
+		}
+		else if (isOperator(value))
+		{
+			// is an operator, evaluate the expression up to this point
 			calculatedValue = calculateExpression(m_Operands, parseOperator(value));
 			m_Operands.push(calculatedValue);
 		}
@@ -256,9 +297,12 @@ double PostFixEvaluator::evaluateExpression(string value)
 	return calculatedValue;
 }
 
+// actually calculate the expression from the last two numbers in the stack
+// and the provided operator
 double PostFixEvaluator::calculateExpression(stack<double>& operands, Operator op)
 {
 	double number1, number2;
+
 	number1 = operands.top();
 	operands.pop();
 	number2 = operands.top();
@@ -302,48 +346,3 @@ double PostFixEvaluator::calculateExpression(stack<double>& operands, Operator o
 
 	Evaluates to 25
 */
-
-
-
-	////if (!isDouble(value))
-	//if (value == "+" || value == "-" || value == "*" || value == "/")
-	//{
-	//	//evaluate(m_Operands, value);
-	//	//cout << "Valid operand " << value << endl;
-	//}
-	//else
-	//{
-	//	auto number = parseNumber<double>(value);
-
-	//	if (number)
-	//		//cout << "Valid number " << number << endl;
-	//		if (m_Operands.size() < 2)
-	//			m_Operands.push(parseNumber<double>(value));
-	//		else
-	//			cout << "Error: two operands already entered!" << endl;
-	//	else
-	//		cout << "Not a valid operator or operand" << endl;
-
-	//	//cout << "Valid number " << value << endl;
-	//	//parseTypes(value);
-	//	//cout << endl;
-	//}
-
-
-//void PostFixEvaluator::parseTypes(string value)
-//{
-//	int int1 = parseNumber<int>(value);
-//	cout << "\t  to int: " << int1 << endl;
-//
-//	long long1 = parseNumber<long>(value);
-//	cout << "\t  to long: " << long1 << endl;
-//
-//	unsigned long long2 = parseNumber<unsigned long>(value);
-//	cout << "\t  to unsigned long: " << long2 << endl;
-//
-//	float float1 = parseNumber<float>(value);
-//	cout << "\t  to float: " << float1 << endl;
-//
-//	double double1 = parseNumber<double>(value);
-//	cout << "\t  to double: " << double1 << endl;
-//}
